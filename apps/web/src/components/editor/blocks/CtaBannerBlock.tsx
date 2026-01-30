@@ -6,41 +6,34 @@ interface CtaBannerBlockProps {
     ctaId?: string;
     style?: 'primary' | 'secondary' | 'accent';
     fullWidth?: boolean;
-    text?: string;
+    title?: string;
+    subtitle?: string;
   };
 }
 
 export function CtaBannerBlock({ properties }: CtaBannerBlockProps) {
   const project = useProjectContext();
-  const { style = 'primary', text, ctaId } = properties;
+  const { title, subtitle, ctaId } = properties;
 
   // Find CTA by ID if specified
   const cta = ctaId ? project.ctas.find((c) => c.id === ctaId) : null;
   const buttonLabel = cta?.label || 'Shop Now';
 
-  // Map style to project colors
-  const getBackgroundColor = () => {
-    switch (style) {
-      case 'accent':
-        return project.brandColors.accent;
-      case 'secondary':
-        return project.brandColors.secondary;
-      default:
-        return project.brandColors.primary;
-    }
-  };
-
-  const displayText = text || `Don't miss out on ${project.brandName}'s best products!`;
+  const displayTitle = title || `Shop ${project.brandName} Now!`;
+  const displaySubtitle = subtitle || `Don't wait! Grab your favorite ${project.brandName} products while stocks last and elevate your everyday experiences.`;
 
   return (
     <div
-      className="text-white p-6 rounded-lg text-center"
-      style={{ backgroundColor: getBackgroundColor() }}
+      className="rounded-lg p-12 text-center text-white"
+      style={{
+        background: `linear-gradient(135deg, ${project.brandColors.primary} 0%, ${project.brandColors.secondary} 100%)`,
+      }}
     >
-      <p className="mb-4 text-lg">{displayText}</p>
-      <button className="bg-white text-gray-900 px-6 py-3 rounded font-semibold inline-flex items-center gap-2 hover:bg-gray-100 transition-colors">
+      <h2 className="text-2xl font-extrabold mb-3">{displayTitle}</h2>
+      <p className="text-white/90 max-w-lg mx-auto mb-6">{displaySubtitle}</p>
+      <button className="inline-flex items-center gap-2 bg-white text-gray-900 px-8 py-4 rounded-lg font-semibold hover:shadow-lg transition-all">
         {buttonLabel}
-        <ArrowRight className="h-4 w-4" />
+        <ArrowRight className="h-5 w-5" />
       </button>
     </div>
   );

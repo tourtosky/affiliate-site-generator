@@ -9,6 +9,9 @@ import { CtaBannerBlock } from './CtaBannerBlock';
 import { TrustBadgesBlock } from './TrustBadgesBlock';
 import { FaqBlock } from './FaqBlock';
 import { FooterBlock } from './FooterBlock';
+import { FeaturesBlock } from './FeaturesBlock';
+import { ComparisonBlock } from './ComparisonBlock';
+import { TestimonialsBlock } from './TestimonialsBlock';
 
 export interface BlockComponentProps {
   properties: Record<string, unknown>;
@@ -25,6 +28,9 @@ export const blockComponents: Record<string, ComponentType<BlockComponentProps>>
   'content-trust': TrustBadgesBlock,
   'content-faq': FaqBlock,
   'footer-standard': FooterBlock,
+  'features-grid': FeaturesBlock,
+  'comparison-table': ComparisonBlock,
+  'testimonials': TestimonialsBlock,
 };
 
 export function getBlockComponent(blockType: string): ComponentType<BlockComponentProps> | null {

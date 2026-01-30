@@ -36,23 +36,23 @@ const templateBlockConfigs: Record<string, TemplatePageConfig> = {
     ],
   },
 
-  // Landing page template - conversion focused
+  // Landing page template - conversion focused (matches actual landing HTML template)
   landing: {
     home: [
       { blockType: 'nav-simple', properties: { sticky: true, showSearch: false } },
-      { blockType: 'hero-standard', properties: { title: 'Discover Premium Products', subtitle: 'Top-rated items handpicked for you', alignment: 'center' } },
-      { blockType: 'products-spotlight', properties: { layout: 'left', showSpecs: true } },
-      { blockType: 'content-trust', properties: { showSecurePayment: true, showMoneyBack: true, showFreeShipping: true, showSupport: true, layout: 'horizontal' } },
-      { blockType: 'reviews-summary', properties: { showProscons: true, rating: 5 } },
-      { blockType: 'content-faq', properties: { heading: 'Frequently Asked Questions', expandable: true } },
-      { blockType: 'cta-banner', properties: { text: 'Ready to get started? Shop now!', style: 'primary', fullWidth: true } },
-      { blockType: 'footer-standard', properties: { showSocialLinks: true, columns: 3 } },
+      { blockType: 'hero-standard', properties: { badge: 'TOP RATED 2024', alignment: 'left' } },
+      { blockType: 'features-grid', properties: { columns: 4 } },
+      { blockType: 'products-grid', properties: { columns: 3, showRatings: true, showPrices: true } },
+      { blockType: 'comparison-table', properties: {} },
+      { blockType: 'testimonials', properties: {} },
+      { blockType: 'cta-banner', properties: { style: 'primary', fullWidth: true } },
+      { blockType: 'footer-standard', properties: { showSocialLinks: true, columns: 4 } },
     ],
     products: [
       { blockType: 'nav-simple', properties: { sticky: true } },
       { blockType: 'products-grid', properties: { columns: 3, showRatings: true, showPrices: true } },
-      { blockType: 'cta-banner', properties: { text: 'View all products', style: 'secondary' } },
-      { blockType: 'footer-standard', properties: { showSocialLinks: true, columns: 2 } },
+      { blockType: 'cta-banner', properties: { style: 'secondary' } },
+      { blockType: 'footer-standard', properties: { showSocialLinks: true, columns: 4 } },
     ],
   },
 

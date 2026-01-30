@@ -3,6 +3,8 @@ import { useProjectContext } from '../EditorContext';
 
 interface ProductGridBlockProps {
   properties: {
+    title?: string;
+    subtitle?: string;
     productIds?: string[];
     columns?: number;
     showRatings?: boolean;
@@ -12,7 +14,14 @@ interface ProductGridBlockProps {
 
 export function ProductGridBlock({ properties }: ProductGridBlockProps) {
   const project = useProjectContext();
-  const { productIds = [], columns = 3, showRatings = true, showPrices = true } = properties;
+  const {
+    title = `Featured ${project.brandName} Products`,
+    subtitle = 'Explore our top-rated selections.',
+    productIds = [],
+    columns = 3,
+    showRatings = true,
+    showPrices = true
+  } = properties;
 
   // Get products from project, filter by productIds if specified
   let displayProducts = project.products;
@@ -40,34 +49,68 @@ export function ProductGridBlock({ properties }: ProductGridBlockProps) {
   }
 
   return (
-    <div className="bg-gray-50 p-4 rounded-lg">
-      <div className="grid gap-4" style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}>
+    <div className="bg-gray-50 rounded-lg p-8">
+      {/* Section Header */}
+      <div className="text-center max-w-xl mx-auto mb-8">
+        <h2 className="text-2xl font-extrabold mb-2">{title}</h2>
+        <p className="text-gray-500">{subtitle}</p>
+      </div>
+
+      {/* Products Grid */}
+      <div className="grid gap-6" style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}>
         {displayProducts.map((product) => {
-          const title = product.customTitle || product.generatedTitle || product.title || 'Product';
+          const productTitle = product.customTitle || product.generatedTitle || product.title || 'Product';
+          const productDesc = product.customDescription || product.generatedDescription || 'High-quality product designed for your needs.';
+
           return (
-            <div key={product.id} className="bg-white rounded-lg p-3 border hover:shadow-md transition-shadow">
-              <div className="aspect-square bg-gray-100 rounded mb-2 flex items-center justify-center overflow-hidden">
+            <div
+              key={product.id}
+              className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all hover:-translate-y-1"
+            >
+              {/* Product Image */}
+              <div className="aspect-[4/3] bg-gray-100 flex items-center justify-center overflow-hidden">
                 {product.imageUrl ? (
-                  <img src={product.imageUrl} alt={title} className="w-full h-full object-cover" />
+                  <img src={product.imageUrl} alt={productTitle} className="w-full h-full object-cover" />
                 ) : (
-                  <Package className="h-8 w-8 text-gray-300" />
+                  <Package className="h-12 w-12 text-gray-300" />
                 )}
               </div>
-              <div className="text-sm font-medium truncate">{title}</div>
-              {showRatings && (
-                <div className="flex items-center gap-1 mt-1">
-                  <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                  <span className="text-xs text-gray-500">4.5</span>
+
+              {/* Product Content */}
+              <div className="p-5">
+                <h3 className="font-bold text-lg mb-1 truncate">{productTitle}</h3>
+                <p className="text-gray-500 text-sm mb-3 line-clamp-2">{productDesc}</p>
+
+                {/* Meta: Rating & Price */}
+                <div className="flex items-center justify-between mb-3">
+                  {showRatings && (
+                    <div className="flex items-center gap-1" style={{ color: project.brandColors.accent }}>
+                      <Star className="h-4 w-4 fill-current" />
+                      <Star className="h-4 w-4 fill-current" />
+                      <Star className="h-4 w-4 fill-current" />
+                      <Star className="h-4 w-4 fill-current" />
+                      <Star className="h-4 w-4 fill-current" />
+                      <span className="font-semibold ml-1">4.8</span>
+                    </div>
+                  )}
+                  {showPrices && (
+                    <span
+                      className="font-bold text-lg"
+                      style={{ color: project.brandColors.primary }}
+                    >
+                      $XX.XX
+                    </span>
+                  )}
                 </div>
-              )}
-              {showPrices && (
-                <div
-                  className="text-sm font-bold mt-1"
-                  style={{ color: project.brandColors.primary }}
+
+                {/* CTA Button */}
+                <button
+                  className="w-full py-3 rounded-lg text-white font-semibold text-sm transition-colors"
+                  style={{ backgroundColor: project.brandColors.primary }}
                 >
-                  View Price
-                </div>
-              )}
+                  View on Amazon
+                </button>
+              </div>
             </div>
           );
         })}

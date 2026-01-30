@@ -224,6 +224,59 @@ export const blockRegistry: BlockTypeDefinition[] = [
       columns: 3,
     },
   },
+
+  // Features Grid
+  {
+    id: 'features-grid',
+    name: 'Features Grid',
+    category: 'content',
+    description: 'Grid of feature cards with icons',
+    ctaSlots: [],
+    properties: [
+      { name: 'title', label: 'Section Title', type: 'text', defaultValue: 'Why Choose Us?' },
+      { name: 'subtitle', label: 'Subtitle', type: 'text', defaultValue: 'Discover the advantages of our products.' },
+      { name: 'columns', label: 'Columns', type: 'number', min: 2, max: 4, defaultValue: 4 },
+    ],
+    defaultProperties: {
+      title: 'Why Choose Us?',
+      subtitle: 'Discover the advantages of our products.',
+      columns: 4,
+    },
+  },
+
+  // Comparison Table
+  {
+    id: 'comparison-table',
+    name: 'Comparison Table',
+    category: 'content',
+    description: 'Product comparison table',
+    ctaSlots: [],
+    properties: [
+      { name: 'title', label: 'Section Title', type: 'text', defaultValue: 'Why We Stand Out' },
+      { name: 'subtitle', label: 'Subtitle', type: 'text', defaultValue: 'See how we compare to the competition.' },
+    ],
+    defaultProperties: {
+      title: 'Why We Stand Out',
+      subtitle: 'See how we compare to the competition.',
+    },
+  },
+
+  // Testimonials
+  {
+    id: 'testimonials',
+    name: 'Testimonials',
+    category: 'reviews',
+    description: 'Customer testimonials section',
+    ctaSlots: [],
+    properties: [
+      { name: 'title', label: 'Section Title', type: 'text', defaultValue: 'What Our Customers Say' },
+      { name: 'subtitle', label: 'Subtitle', type: 'text', defaultValue: 'Real feedback from satisfied users.' },
+    ],
+    defaultProperties: {
+      title: 'What Our Customers Say',
+      subtitle: 'Real feedback from satisfied users.',
+    },
+  },
 ];
 
 export function getBlockDefinition(blockType: string): BlockTypeDefinition | undefined {

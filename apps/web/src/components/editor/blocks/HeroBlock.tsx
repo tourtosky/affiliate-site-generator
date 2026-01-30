@@ -1,4 +1,4 @@
-import { Image } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { useProjectContext } from '../EditorContext';
 
 interface HeroBlockProps {
@@ -6,38 +6,75 @@ interface HeroBlockProps {
     title?: string;
     subtitle?: string;
     backgroundImage?: string;
+    badge?: string;
     alignment?: 'left' | 'center' | 'right';
   };
 }
 
 export function HeroBlock({ properties }: HeroBlockProps) {
   const project = useProjectContext();
-  const { title, subtitle, alignment = 'center', backgroundImage } = properties;
+  const { title, subtitle, badge = 'TOP RATED 2024', backgroundImage } = properties;
 
-  // Use project brand name if no custom title set
-  const displayTitle = title || `Discover ${project.brandName}'s Quality`;
-  const displaySubtitle = subtitle || project.brandDescription || 'Top-rated products handpicked for you';
-
-  const alignClass = alignment === 'left' ? 'text-left' : alignment === 'right' ? 'text-right' : 'text-center';
+  const displayTitle = title || `Discover ${project.brandName}'s Exceptional Quality`;
+  const displaySubtitle = subtitle || project.brandDescription || 'Elevate your lifestyle with top-notch products crafted for durability and performance.';
 
   return (
     <div
-      className={`relative text-white p-8 rounded-lg ${alignClass} overflow-hidden`}
+      className="relative rounded-lg overflow-hidden text-white"
       style={{
-        background: backgroundImage
-          ? `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url(${backgroundImage}) center/cover`
-          : `linear-gradient(135deg, ${project.brandColors.primary}, ${project.brandColors.secondary})`,
+        background: `linear-gradient(135deg, #111827 0%, #1f2937 100%)`,
+        minHeight: '300px',
       }}
     >
-      <div className="max-w-2xl mx-auto relative z-10">
-        <h2 className="text-2xl font-bold mb-2">{displayTitle}</h2>
-        <p className="text-white/80">{displaySubtitle}</p>
+      {/* Background image overlay */}
+      {backgroundImage && (
         <div
-          className="mt-4 inline-flex items-center gap-2 px-6 py-3 rounded font-semibold"
-          style={{ backgroundColor: project.brandColors.accent }}
+          className="absolute inset-0 opacity-30"
+          style={{
+            backgroundImage: `url(${backgroundImage})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+        />
+      )}
+
+      <div className="relative z-10 p-8 max-w-xl">
+        {/* Badge */}
+        <span
+          className="inline-block px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide mb-4"
+          style={{
+            backgroundColor: project.brandColors.accent,
+            color: '#111827'
+          }}
         >
-          <Image className="h-4 w-4" />
-          <span>Shop Now</span>
+          {badge}
+        </span>
+
+        {/* Title */}
+        <h1 className="text-3xl font-extrabold leading-tight mb-4">
+          {displayTitle}
+        </h1>
+
+        {/* Subtitle */}
+        <p className="text-white/80 text-base mb-6 max-w-md">
+          {displaySubtitle}
+        </p>
+
+        {/* Buttons */}
+        <div className="flex gap-3 flex-wrap">
+          <button
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-semibold text-sm transition-all"
+            style={{
+              backgroundColor: project.brandColors.accent,
+              color: '#111827'
+            }}
+          >
+            Shop Now
+            <ArrowRight className="h-4 w-4" />
+          </button>
+          <button className="px-6 py-3 rounded-lg font-semibold text-sm border-2 border-white/30 text-white hover:border-white transition-all">
+            View Products
+          </button>
         </div>
       </div>
     </div>

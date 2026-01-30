@@ -1,4 +1,3 @@
-import { Facebook, Twitter, Instagram } from 'lucide-react';
 import { useProjectContext } from '../EditorContext';
 
 interface FooterBlockProps {
@@ -9,35 +8,68 @@ interface FooterBlockProps {
   };
 }
 
+const quickLinks = ['Features', 'Products', 'Compare', 'Reviews'];
+const supportLinks = ['Contact Us', 'FAQ', 'Shipping Info', 'Returns'];
+const legalLinks = ['Privacy Policy', 'Terms of Service', 'Affiliate Disclosure'];
+
 export function FooterBlock({ properties }: FooterBlockProps) {
   const project = useProjectContext();
   const year = new Date().getFullYear();
-  const defaultCopyright = `© ${year} ${project.brandName}. All rights reserved`;
-  const { copyright = defaultCopyright, showSocialLinks = true, columns = 3 } = properties;
 
   return (
-    <div className="bg-gray-900 text-white rounded-lg p-6">
-      <div className={`grid gap-8 mb-6`} style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}>
-        {Array.from({ length: columns }).map((_, i) => (
-          <div key={i}>
-            <h4 className="font-medium mb-2">Column {i + 1}</h4>
-            <ul className="text-sm text-gray-400 space-y-1">
-              <li>Link 1</li>
-              <li>Link 2</li>
-              <li>Link 3</li>
-            </ul>
+    <div className="bg-gray-900 text-white/70 rounded-lg p-8">
+      {/* Footer Grid */}
+      <div className="grid grid-cols-4 gap-8 mb-8">
+        {/* Brand Column */}
+        <div className="col-span-1">
+          <div className="text-white font-bold text-xl mb-3" style={{ color: project.brandColors.primary }}>
+            {project.brandName}
           </div>
-        ))}
+          <p className="text-sm">
+            {project.brandDescription || `${project.brandName} - Your trusted source for product recommendations.`}
+          </p>
+        </div>
+
+        {/* Quick Links */}
+        <div>
+          <h4 className="text-white font-semibold mb-4">Quick Links</h4>
+          <ul className="space-y-2 text-sm">
+            {quickLinks.map((link) => (
+              <li key={link} className="hover:text-white cursor-pointer">{link}</li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Support */}
+        <div>
+          <h4 className="text-white font-semibold mb-4">Support</h4>
+          <ul className="space-y-2 text-sm">
+            {supportLinks.map((link) => (
+              <li key={link} className="hover:text-white cursor-pointer">{link}</li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Legal */}
+        <div>
+          <h4 className="text-white font-semibold mb-4">Legal</h4>
+          <ul className="space-y-2 text-sm">
+            {legalLinks.map((link) => (
+              <li key={link} className="hover:text-white cursor-pointer">{link}</li>
+            ))}
+          </ul>
+        </div>
       </div>
-      <div className="border-t border-gray-700 pt-4 flex items-center justify-between">
-        <span className="text-sm text-gray-400">{copyright}</span>
-        {showSocialLinks && (
-          <div className="flex gap-3">
-            <Facebook className="h-5 w-5 text-gray-400" />
-            <Twitter className="h-5 w-5 text-gray-400" />
-            <Instagram className="h-5 w-5 text-gray-400" />
-          </div>
-        )}
+
+      {/* Affiliate Disclosure */}
+      <div className="bg-white/5 rounded-lg p-4 mb-6 text-xs">
+        <strong className="text-white">Affiliate Disclosure:</strong> {project.brandName} is a participant in the Amazon Services LLC Associates Program, an affiliate advertising program designed to provide a means for sites to earn advertising fees by advertising and linking to Amazon.com.
+      </div>
+
+      {/* Footer Bottom */}
+      <div className="border-t border-white/10 pt-6 flex justify-between items-center text-sm">
+        <p>&copy; {year} {project.brandName}. All rights reserved.</p>
+        <p>As an Amazon Associate, we earn from qualifying purchases.</p>
       </div>
     </div>
   );
