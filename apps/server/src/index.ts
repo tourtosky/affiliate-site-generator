@@ -14,6 +14,7 @@ import { settingsRouter } from './routes/settings.js';
 import { templatesRouter } from './routes/templates.js';
 import { infrastructureRouter } from './routes/infrastructure.js';
 import { uploadsRouter } from './routes/uploads.js';
+import { blocksRouter } from './routes/blocks.js';
 
 const app = express();
 const httpServer = createServer(app);
@@ -52,6 +53,8 @@ app.use('/api/settings', settingsRouter);
 app.use('/api/templates', templatesRouter);
 app.use('/api/infrastructure', infrastructureRouter);
 app.use('/api/projects', uploadsRouter);
+app.use('/api/blocks', blocksRouter);
+app.use('/api', blocksRouter);
 
 // Socket.IO connection handling
 io.on('connection', (socket) => {
