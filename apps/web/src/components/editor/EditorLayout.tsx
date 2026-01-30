@@ -35,7 +35,7 @@ interface ProjectResponse {
   id: string;
   brandName: string;
   brandDescription: string | null;
-  brandColors: string;
+  brandColors: string | { primary: string; secondary: string; accent: string };
   logoUrl: string | null;
   products: Array<{
     id: string;
@@ -106,11 +106,14 @@ export function EditorLayout() {
   const isLoading = layoutLoading || projectLoading;
 
   // Transform project data for context
+  const defaultColors = { primary: '#2563eb', secondary: '#1e40af', accent: '#f59e0b' };
   const projectContext: ProjectContext | null = projectData
     ? {
         brandName: projectData.brandName,
         brandDescription: projectData.brandDescription,
-        brandColors: JSON.parse(projectData.brandColors || '{"primary":"#2563eb","secondary":"#1e40af","accent":"#f59e0b"}'),
+        brandColors: typeof projectData.brandColors === 'string'
+          ? JSON.parse(projectData.brandColors || JSON.stringify(defaultColors))
+          : (projectData.brandColors || defaultColors),
         logoUrl: projectData.logoUrl,
         products: projectData.products || [],
         ctas: projectData.ctas || [],
