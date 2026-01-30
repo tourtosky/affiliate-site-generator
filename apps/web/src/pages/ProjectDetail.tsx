@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link, Routes, Route, useLocation } from 'react-router-dom';
+import { useParams, Link, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   ArrowLeft,
@@ -110,6 +110,7 @@ interface AIStatus {
 export function ProjectDetail() {
   const { id } = useParams<{ id: string }>();
   const location = useLocation();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationStatus, setGenerationStatus] = useState<GenerationStatus | null>(null);
@@ -226,6 +227,10 @@ export function ProjectDetail() {
           </span>
         </div>
         <div className="flex items-center gap-2">
+          <Button variant="outline" onClick={() => navigate(`/projects/${id}/editor`)}>
+            <Pencil className="h-4 w-4 mr-2" />
+            Edit Layout
+          </Button>
           <Button
             variant="outline"
             disabled={project.generationCount === 0}
