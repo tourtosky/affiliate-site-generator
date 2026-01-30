@@ -30,6 +30,8 @@ model Project {
   template          String   @default("modern")
   selectedBlocks    String   @default("[]") // JSON array
   selectedPages     String   @default("[\"home\",\"products\",\"about\"]") // JSON array
+  // Page layouts for block editor (JSON)
+  pageLayouts       String   @default("{}")
   languages         String   @default("[\"en\"]") // JSON array
   defaultLanguage   String   @default("en")
 
