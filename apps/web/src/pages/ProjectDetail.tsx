@@ -80,7 +80,14 @@ interface Project {
   htaccessConfig?: HtaccessConfig;
   logoUrl?: string;
   faviconUrl?: string;
-  products: Array<{ id: string; asin: string; title?: string }>;
+  products: Array<{
+    id: string;
+    asin: string;
+    title?: string;
+    customTitle?: string;
+    customDescription?: string;
+    imageUrl?: string;
+  }>;
   ctas: Array<{ id: string; name: string; label: string; placement: string }>;
   domains: Array<{ id: string; domain: string; isPrimary: boolean }>;
   generations: Array<{
@@ -1243,21 +1250,63 @@ function ProjectOverview({ project }: { project: Project }) {
   );
 }
 
+interface ProductFormData {
+  asin: string;
+  customTitle: string;
+  customDescription: string;
+  imageUrl: string;
+}
+
 function ProjectProducts({ project }: { project: Project }) {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [asin, setAsin] = useState('');
+  const [editingProduct, setEditingProduct] = useState<Project['products'][0] | null>(null);
+  const [formData, setFormData] = useState<ProductFormData>({
+    asin: '',
+    customTitle: '',
+    customDescription: '',
+    imageUrl: '',
+  });
   const queryClient = useQueryClient();
 
+  const resetForm = () => {
+    setFormData({ asin: '', customTitle: '', customDescription: '', imageUrl: '' });
+    setEditingProduct(null);
+  };
+
   const addProductMutation = useMutation({
-    mutationFn: (data: { asin: string }) => api.post(`/projects/${project.id}/products`, data),
+    mutationFn: (data: Partial<ProductFormData> & { asin: string }) =>
+      api.post(`/projects/${project.id}/products`, {
+        asin: data.asin,
+        customTitle: data.customTitle || undefined,
+        customDescription: data.customDescription || undefined,
+        imageUrl: data.imageUrl || undefined,
+      }),
     onSuccess: () => {
       toast({ title: 'Product added successfully' });
       queryClient.invalidateQueries({ queryKey: ['project', project.id] });
       setIsAddDialogOpen(false);
-      setAsin('');
+      resetForm();
     },
     onError: (error: Error) => {
       toast({ title: 'Failed to add product', description: error.message, variant: 'destructive' });
+    },
+  });
+
+  const updateProductMutation = useMutation({
+    mutationFn: ({ productId, data }: { productId: string; data: Partial<ProductFormData> }) =>
+      api.put(`/projects/${project.id}/products/${productId}`, {
+        customTitle: data.customTitle || null,
+        customDescription: data.customDescription || null,
+        imageUrl: data.imageUrl || null,
+      }),
+    onSuccess: () => {
+      toast({ title: 'Product updated successfully' });
+      queryClient.invalidateQueries({ queryKey: ['project', project.id] });
+      setIsAddDialogOpen(false);
+      resetForm();
+    },
+    onError: (error: Error) => {
+      toast({ title: 'Failed to update product', description: error.message, variant: 'destructive' });
     },
   });
 
@@ -1274,9 +1323,33 @@ function ProjectProducts({ project }: { project: Project }) {
 
   const handleAddProduct = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!asin.trim()) return;
-    addProductMutation.mutate({ asin: asin.trim() });
+    if (!formData.asin.trim()) return;
+    addProductMutation.mutate(formData);
   };
+
+  const handleUpdateProduct = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingProduct) return;
+    updateProductMutation.mutate({ productId: editingProduct.id, data: formData });
+  };
+
+  const openEditDialog = (product: Project['products'][0]) => {
+    setEditingProduct(product);
+    setFormData({
+      asin: product.asin,
+      customTitle: (product as any).customTitle || '',
+      customDescription: (product as any).customDescription || '',
+      imageUrl: (product as any).imageUrl || '',
+    });
+    setIsAddDialogOpen(true);
+  };
+
+  const openAddDialog = () => {
+    resetForm();
+    setIsAddDialogOpen(true);
+  };
+
+  const isPending = addProductMutation.isPending || updateProductMutation.isPending;
 
   return (
     <Card>
@@ -1286,44 +1359,90 @@ function ProjectProducts({ project }: { project: Project }) {
             <CardTitle>Products</CardTitle>
             <CardDescription>Amazon products for this site</CardDescription>
           </div>
-          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+          <Dialog open={isAddDialogOpen} onOpenChange={(open) => { setIsAddDialogOpen(open); if (!open) resetForm(); }}>
             <DialogTrigger asChild>
-              <Button>Add Product</Button>
+              <Button onClick={openAddDialog}>Add Product</Button>
             </DialogTrigger>
-            <DialogContent>
-              <form onSubmit={handleAddProduct}>
+            <DialogContent className="sm:max-w-lg">
+              <form onSubmit={editingProduct ? handleUpdateProduct : handleAddProduct}>
                 <DialogHeader>
-                  <DialogTitle>Add Product</DialogTitle>
+                  <DialogTitle>{editingProduct ? 'Edit Product' : 'Add Product'}</DialogTitle>
                   <DialogDescription>
-                    Enter the Amazon ASIN to add a product to this project.
+                    {editingProduct
+                      ? 'Update product details for your site.'
+                      : 'Add an Amazon product with custom details.'}
                   </DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-4 py-4">
                   <div className="grid gap-2">
-                    <Label htmlFor="asin">ASIN</Label>
+                    <Label htmlFor="asin">ASIN *</Label>
                     <Input
                       id="asin"
                       placeholder="e.g., B09V3KXJPB"
-                      value={asin}
-                      onChange={(e) => setAsin(e.target.value)}
-                      disabled={addProductMutation.isPending}
+                      value={formData.asin}
+                      onChange={(e) => setFormData({ ...formData, asin: e.target.value })}
+                      disabled={isPending || !!editingProduct}
                     />
                     <p className="text-xs text-muted-foreground">
-                      The ASIN can be found in the Amazon product URL or product details.
+                      The ASIN can be found in the Amazon product URL.
                     </p>
                   </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="customTitle">Product Name</Label>
+                    <Input
+                      id="customTitle"
+                      placeholder="e.g., Premium Stainless Steel Water Bottle"
+                      value={formData.customTitle}
+                      onChange={(e) => setFormData({ ...formData, customTitle: e.target.value })}
+                      disabled={isPending}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="customDescription">Short Description</Label>
+                    <Input
+                      id="customDescription"
+                      placeholder="e.g., Keep drinks cold for 24 hours"
+                      value={formData.customDescription}
+                      onChange={(e) => setFormData({ ...formData, customDescription: e.target.value })}
+                      disabled={isPending}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="imageUrl">Image URL</Label>
+                    <Input
+                      id="imageUrl"
+                      type="url"
+                      placeholder="https://example.com/product-image.jpg"
+                      value={formData.imageUrl}
+                      onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
+                      disabled={isPending}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Direct link to product image (or leave empty to use placeholder).
+                    </p>
+                  </div>
+                  {formData.imageUrl && (
+                    <div className="border rounded-lg p-2">
+                      <img
+                        src={formData.imageUrl}
+                        alt="Preview"
+                        className="h-20 w-auto object-contain mx-auto"
+                        onError={(e) => (e.currentTarget.style.display = 'none')}
+                      />
+                    </div>
+                  )}
                 </div>
                 <DialogFooter>
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => setIsAddDialogOpen(false)}
-                    disabled={addProductMutation.isPending}
+                    onClick={() => { setIsAddDialogOpen(false); resetForm(); }}
+                    disabled={isPending}
                   >
                     Cancel
                   </Button>
-                  <Button type="submit" disabled={addProductMutation.isPending || !asin.trim()}>
-                    {addProductMutation.isPending ? 'Adding...' : 'Add Product'}
+                  <Button type="submit" disabled={isPending || !formData.asin.trim()}>
+                    {isPending ? 'Saving...' : editingProduct ? 'Update Product' : 'Add Product'}
                   </Button>
                 </DialogFooter>
               </form>
@@ -1337,23 +1456,51 @@ function ProjectProducts({ project }: { project: Project }) {
             No products added yet. Add Amazon products by their ASIN.
           </p>
         ) : (
-          <div className="space-y-2">
-            {project.products.map((product) => (
-              <div key={product.id} className="flex items-center justify-between rounded-lg border p-3">
-                <div>
-                  <p className="font-medium">{product.title || product.asin}</p>
-                  <p className="text-xs text-muted-foreground">ASIN: {product.asin}</p>
+          <div className="space-y-3">
+            {project.products.map((product) => {
+              const prod = product as any;
+              const title = prod.customTitle || prod.title || product.asin;
+              const description = prod.customDescription;
+              const imageUrl = prod.imageUrl;
+              return (
+                <div key={product.id} className="flex items-start gap-4 rounded-lg border p-4">
+                  {/* Product Image */}
+                  <div className="flex-shrink-0 w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center">
+                    {imageUrl ? (
+                      <img src={imageUrl} alt={title} className="w-full h-full object-cover" />
+                    ) : (
+                      <Package className="h-6 w-6 text-gray-300" />
+                    )}
+                  </div>
+                  {/* Product Details */}
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium truncate">{title}</p>
+                    {description && (
+                      <p className="text-sm text-muted-foreground truncate">{description}</p>
+                    )}
+                    <p className="text-xs text-muted-foreground mt-1">ASIN: {product.asin}</p>
+                  </div>
+                  {/* Actions */}
+                  <div className="flex items-center gap-1">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => openEditDialog(product)}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => deleteProductMutation.mutate(product.id)}
+                      disabled={deleteProductMutation.isPending}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => deleteProductMutation.mutate(product.id)}
-                  disabled={deleteProductMutation.isPending}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </CardContent>

@@ -14,10 +14,10 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --primary: {{primaryColor}};
-      --primary-dark: {{primaryDark}};
-      --secondary: {{secondaryColor}};
-      --accent: {{accentColor}};
+      --primary: #2563eb;
+      --primary-dark: #003dc5;
+      --secondary: #1e40af;
+      --accent: #f59e0b;
       --text: #1a1a1a;
       --text-muted: #6b7280;
       --bg: #ffffff;
@@ -529,24 +529,6 @@
 </head>
 <body>
 
-  <!-- Hero -->
-  <section class="hero">
-    <div class="container">
-      <div class="hero-content">
-        <span class="hero-badge">TOP RATED 2024</span>
-        <h1>Discover the Best Epica Products</h1>
-        <p>We've researched and tested the top products to help you make the right choice. Find expert reviews, comparisons, and the best deals.</p>
-        <div class="hero-buttons">
-          <a href="#products" class="btn btn-primary" target="_blank" rel="nofollow noopener">
-            Shop Now on Amazon
-            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </a>
-          <a href="#products" class="btn btn-outline">View Products</a>
-        </div>
-      </div>
-    </div>
-  </section>
-
   <!-- Header -->
   <header class="header">
     <div class="container header-inner">
@@ -557,9 +539,72 @@
         <a href="#compare">Compare</a>
         <a href="#reviews">Reviews</a>
       </nav>
-      <a href="#products" class="header-cta" target="_blank" rel="nofollow noopener">Shop Now on Amazon</a>
+      <a href="https://www.amazon.com/dp/B00FU6PDLU?tag=epica-20" class="header-cta" target="_blank" rel="nofollow noopener">Shop Now on Amazon</a>
     </div>
   </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-content">
+        <span class="hero-badge">TOP RATED 2024</span>
+        <h1>Discover the Best Epica Products</h1>
+        <p>We've researched and tested the top products to help you make the right choice. Find expert reviews, comparisons, and the best deals.</p>
+        <div class="hero-buttons">
+          <a href="https://www.amazon.com/dp/B00FU6PDLU?tag=epica-20" class="btn btn-primary" target="_blank" rel="nofollow noopener">
+            Shop Now on Amazon
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+          <a href="#products" class="btn btn-outline">View Products</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Products -->
+  <section class="products" id="products">
+    <div class="container">
+      <div class="section-header">
+        <h2>Our Top Picks</h2>
+        <p>Hand-selected products reviewed by our Epica experts.</p>
+      </div>
+      <div class="products-grid">
+        
+        <div class="product-card">
+          <div class="product-image">
+            <img src="https://via.placeholder.com/400x300/f3f4f6/9ca3af?text=B00FU6PDLU" alt="Product 1" loading="lazy">
+          </div>
+          <div class="product-content">
+            <h3>Product 1</h3>
+            <p>High-quality product available on Amazon. ASIN: B00FU6PDLU</p>
+            <div class="product-meta">
+              <span class="product-rating">★★★★★ 4.5</span>
+              <span class="product-price">Check Price</span>
+            </div>
+            <a href="https://www.amazon.com/dp/B00FU6PDLU?tag=epica-20" class="product-cta" target="_blank" rel="nofollow noopener sponsored">
+              View on Amazon
+            </a>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="product-image">
+            <img src="https://via.placeholder.com/400x300/f3f4f6/9ca3af?text=B075N83693" alt="Product 2" loading="lazy">
+          </div>
+          <div class="product-content">
+            <h3>Product 2</h3>
+            <p>High-quality product available on Amazon. ASIN: B075N83693</p>
+            <div class="product-meta">
+              <span class="product-rating">★★★★★ 4.5</span>
+              <span class="product-price">Check Price</span>
+            </div>
+            <a href="https://www.amazon.com/dp/B075N83693?tag=epica-20" class="product-cta" target="_blank" rel="nofollow noopener sponsored">
+              View on Amazon
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <!-- Features -->
   <section class="features" id="features">
@@ -594,19 +639,6 @@
     </div>
   </section>
 
-  <!-- Products -->
-  <section class="products" id="products">
-    <div class="container">
-      <div class="section-header">
-        <h2>Our Top Picks</h2>
-        <p>Hand-selected products reviewed by our Epica experts.</p>
-      </div>
-      <div class="products-grid">
-        
-      </div>
-    </div>
-  </section>
-
   <!-- Comparison -->
   <section class="comparison" id="compare">
     <div class="container">
@@ -618,26 +650,26 @@
         <thead>
           <tr>
             <th>Feature</th>
-            
+            <th>Product 1</th><th>Product 2</th>
           </tr>
         </thead>
         <tbody>
           
           <tr>
             <td><strong>Quality Rating</strong></td>
-            
+            <td>★★★★★</td><td>★★★★★</td>
           </tr>
           <tr>
             <td><strong>Prime Eligible</strong></td>
-            
+            <td><span class="check">✓ Yes</span></td><td><span class="check">✓ Yes</span></td>
           </tr>
           <tr>
             <td><strong>Free Returns</strong></td>
-            
+            <td><span class="check">✓ Yes</span></td><td><span class="check">✓ Yes</span></td>
           </tr>
           <tr>
             <td><strong>Our Pick</strong></td>
-            
+            <td><span class="check">★ Best</span></td><td>-</td>
           </tr>
         </tbody>
       </table>
@@ -692,7 +724,7 @@
     <div class="container">
       <h2>Ready to Find Your Perfect Product?</h2>
       <p>Browse our curated selection and discover why thousands trust Epica for their purchasing decisions.</p>
-      <a href="#products" class="btn" target="_blank" rel="nofollow noopener">
+      <a href="https://www.amazon.com/dp/B00FU6PDLU?tag=epica-20" class="btn" target="_blank" rel="nofollow noopener">
         Shop Now on Amazon
         <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
       </a>
