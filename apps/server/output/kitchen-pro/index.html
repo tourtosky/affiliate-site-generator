@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Discover Kitchen Pro's top-rated kitchen products designed for quality and efficiency. Elevate your cooking experience today!">
+  <title>Kitchen Pro - Cook Like a Pro</title>
+  <link rel="icon" type="image/x-icon" href="assets/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary: #23672e;
+      --primary-dark: #004108;
+      --secondary: #8a9cd6;
+      --accent: #0af5ae;
+      --text: #1a1a1a;
+      --text-muted: #6b7280;
+      --bg: #ffffff;
+      --bg-alt: #f9fafb;
+      --bg-dark: #111827;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      line-height: 1.6;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; height: auto; }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Header */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 72px;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-img {
+      height: 40px;
+      width: auto;
+      max-width: 160px;
+      object-fit: contain;
+    }
+
+    .nav { display: flex; gap: 32px; }
+    .nav a { font-weight: 500; color: var(--text-muted); transition: color 0.2s; }
+    .nav a:hover { color: var(--primary); }
+
+    .header-cta {
+      background: var(--primary);
+      color: white;
+      padding: 10px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+    .header-cta:hover { background: var(--primary-dark); }
+
+    /* Hero */
+    .hero {
+      position: relative;
+      min-height: 90vh;
+      display: flex;
+      align-items: center;
+      background: linear-gradient(135deg, var(--bg-dark) 0%, #1f2937 100%);
+      overflow: hidden;
+      padding-top: 72px;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url('https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1600&auto=format') center/cover;
+      opacity: 0.3;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 700px;
+      color: white;
+      padding: 80px 0;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      background: var(--accent);
+      color: var(--bg-dark);
+      padding: 6px 16px;
+      border-radius: 50px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin-bottom: 24px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.5rem, 6vw, 4rem);
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 24px;
+    }
+
+    .hero p {
+      font-size: 1.25rem;
+      color: rgba(255,255,255,0.8);
+      margin-bottom: 40px;
+      max-width: 540px;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 16px 32px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 1rem;
+      transition: all 0.2s;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: var(--bg-dark);
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+
+    .btn-outline {
+      background: transparent;
+      color: white;
+      border: 2px solid rgba(255,255,255,0.3);
+    }
+    .btn-outline:hover { border-color: white; }
+
+    /* Features */
+    .features {
+      padding: 100px 0;
+      background: var(--bg);
+    }
+
+    .section-header {
+      text-align: center;
+      max-width: 600px;
+      margin: 0 auto 60px;
+    }
+
+    .section-header h2 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 16px;
+    }
+
+    .section-header p {
+      color: var(--text-muted);
+      font-size: 1.125rem;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 32px;
+    }
+
+    .feature-card {
+      padding: 32px;
+      border-radius: 16px;
+      background: var(--bg-alt);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    }
+
+    .feature-icon {
+      width: 56px;
+      height: 56px;
+      background: var(--primary);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      color: white;
+      font-size: 1.5rem;
+    }
+
+    .feature-card h3 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .feature-card p {
+      color: var(--text-muted);
+    }
+
+    /* Products */
+    .products {
+      padding: 100px 0;
+      background: var(--bg-alt);
+    }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 32px;
+    }
+
+    .product-card {
+      background: white;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .product-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    }
+
+    .product-image {
+      aspect-ratio: 4/3;
+      background: var(--bg-alt);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .product-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .product-content {
+      padding: 24px;
+    }
+
+    .product-card h3 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .product-card p {
+      color: var(--text-muted);
+      font-size: 0.9375rem;
+      margin-bottom: 16px;
+    }
+
+    .product-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .product-rating {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .product-price {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .product-cta {
+      display: block;
+      width: 100%;
+      text-align: center;
+      background: var(--primary);
+      color: white;
+      padding: 14px;
+      border-radius: 8px;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+
+    .product-cta:hover { background: var(--primary-dark); }
+
+    /* Comparison */
+    .comparison {
+      padding: 100px 0;
+      background: var(--bg);
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+
+    .comparison-table th,
+    .comparison-table td {
+      padding: 20px 24px;
+      text-align: left;
+      border-bottom: 1px solid var(--bg-alt);
+    }
+
+    .comparison-table th {
+      background: var(--bg-dark);
+      color: white;
+      font-weight: 600;
+    }
+
+    .comparison-table th:first-child { border-radius: 16px 0 0 0; }
+    .comparison-table th:last-child { border-radius: 0 16px 0 0; }
+
+    .comparison-table tr:last-child td { border-bottom: none; }
+
+    .comparison-table tr:hover td { background: var(--bg-alt); }
+
+    .check { color: #10b981; font-weight: bold; }
+    .cross { color: #ef4444; }
+
+    /* Testimonials */
+    .testimonials {
+      padding: 100px 0;
+      background: var(--bg-dark);
+      color: white;
+    }
+
+    .testimonials .section-header h2 { color: white; }
+    .testimonials .section-header p { color: rgba(255,255,255,0.6); }
+
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 32px;
+    }
+
+    .testimonial-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      padding: 32px;
+    }
+
+    .testimonial-text {
+      font-size: 1.125rem;
+      line-height: 1.7;
+      margin-bottom: 24px;
+      font-style: italic;
+      color: rgba(255,255,255,0.9);
+    }
+
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .testimonial-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.25rem;
+    }
+
+    .testimonial-name {
+      font-weight: 600;
+    }
+
+    .testimonial-title {
+      font-size: 0.875rem;
+      color: rgba(255,255,255,0.5);
+    }
+
+    /* CTA Section */
+    .cta-section {
+      padding: 100px 0;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      text-align: center;
+      color: white;
+    }
+
+    .cta-section h2 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 16px;
+    }
+
+    .cta-section p {
+      font-size: 1.25rem;
+      opacity: 0.9;
+      margin-bottom: 32px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .cta-section .btn {
+      background: white;
+      color: var(--primary);
+      font-size: 1.125rem;
+      padding: 18px 40px;
+    }
+
+    .cta-section .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    /* Footer */
+    .footer {
+      background: var(--bg-dark);
+      color: rgba(255,255,255,0.7);
+      padding: 60px 0 30px;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr repeat(3, 1fr);
+      gap: 48px;
+      margin-bottom: 48px;
+    }
+
+    .footer-brand .logo {
+      color: white;
+      margin-bottom: 16px;
+      display: inline-block;
+    }
+
+    .footer-brand p {
+      font-size: 0.9375rem;
+      max-width: 300px;
+    }
+
+    .footer-column h4 {
+      color: white;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    .footer-column ul { list-style: none; }
+    .footer-column li { margin-bottom: 12px; }
+    .footer-column a:hover { color: white; }
+
+    .footer-bottom {
+      border-top: 1px solid rgba(255,255,255,0.1);
+      padding-top: 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .affiliate-disclosure {
+      background: rgba(255,255,255,0.05);
+      border-radius: 8px;
+      padding: 20px;
+      margin-top: 32px;
+      font-size: 0.8125rem;
+    }
+
+    .affiliate-disclosure strong {
+      color: white;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .nav { display: none; }
+      .hero h1 { font-size: 2.25rem; }
+      .footer-grid { grid-template-columns: 1fr; }
+      .comparison-table { font-size: 0.875rem; }
+      .comparison-table th, .comparison-table td { padding: 12px 16px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="container header-inner">
+      <a href="/" class="logo"><img src="assets/logo.png" alt="Kitchen Pro" class="logo-img"></a>
+      <nav class="nav">
+        <a href="#features">Features</a>
+        <a href="#products">Products</a>
+        <a href="#compare">Compare</a>
+        <a href="#reviews">Reviews</a>
+      </nav>
+      <a href="https://www.amazon.com/dp/B00FU6PDLU?tag=kitchenpro-20" class="header-cta" target="_blank" rel="nofollow noopener">Shop Now</a>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-content">
+        <span class="hero-badge">Top Rated 2024</span>
+        <h1>Elevate Your Kitchen Experience</h1>
+        <p>Transform your cooking with Kitchen Pro's premium kitchen products. Designed for both efficiency and style, our tools make every meal a masterpiece.</p>
+        <div class="hero-buttons">
+          <a href="https://www.amazon.com/dp/B00FU6PDLU?tag=kitchenpro-20" class="btn btn-primary" target="_blank" rel="nofollow noopener">
+            Shop Now
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+          <a href="#products" class="btn btn-outline">View Products</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="features" id="features">
+    <div class="container">
+      <div class="section-header">
+        <h2>Why Choose Kitchen Pro?</h2>
+        <p>Discover the benefits of our innovative kitchen tools.</p>
+      </div>
+      <div class="features-grid">
+        
+        <div class="feature-card">
+          <div class="feature-icon">✓</div>
+          <h3>Durable Quality</h3>
+          <p>Crafted from high-grade materials for long-lasting performance.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">⚡</div>
+          <h3>Time-Saving Design</h3>
+          <p>Innovative features that streamline your cooking process.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">🎯</div>
+          <h3>Versatile Use</h3>
+          <p>Perfect for all cooking styles, from beginner to expert chefs.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">💰</div>
+          <h3>Affordable Excellence</h3>
+          <p>Premium kitchen tools at prices that won’t break the bank.</p>
+        </div>
+        
+      </div>
+    </div>
+  </section>
+
+  <!-- Products -->
+  <section class="products" id="products">
+    <div class="container">
+      <div class="section-header">
+        <h2>Featured Products</h2>
+        <p>Explore our top-rated kitchen essentials.</p>
+      </div>
+      <div class="products-grid">
+        
+        <div class="product-card">
+          <div class="product-image">
+            <img src="https://via.placeholder.com/400x300/f3f4f6/9ca3af?text=B00FU6PDLU" alt="Ultimate Chef Knife" loading="lazy">
+          </div>
+          <div class="product-content">
+            <h3>Ultimate Chef Knife</h3>
+            <p>Experience precision and control like never before with our Ultimate Chef Knife. Perfectly balanced and razor-sharp, it's a must-have for any kitchen enthusiast.</p>
+            <div class="product-meta">
+              <span class="product-rating">★★★★★ 4.8</span>
+              <span class="product-price">Check Price</span>
+            </div>
+            <a href="https://www.amazon.com/dp/B00FU6PDLU?tag=kitchenpro-20" class="product-cta" target="_blank" rel="nofollow noopener sponsored">
+              Check price
+            </a>
+          </div>
+        </div>
+        
+        <div class="product-card">
+          <div class="product-image">
+            <img src="https://via.placeholder.com/400x300/f3f4f6/9ca3af?text=B00AMNCYNQ" alt="Professional Cutting Board" loading="lazy">
+          </div>
+          <div class="product-content">
+            <h3>Professional Cutting Board</h3>
+            <p>Upgrade your prep space with our Professional Cutting Board, designed for durability and easy cleaning. Its non-slip surface ensures safety while chopping your favorite ingredients.</p>
+            <div class="product-meta">
+              <span class="product-rating">★★★★★ 4.8</span>
+              <span class="product-price">Check Price</span>
+            </div>
+            <a href="https://www.amazon.com/dp/B00AMNCYNQ?tag=kitchenpro-20" class="product-cta" target="_blank" rel="nofollow noopener sponsored">
+              Check price
+            </a>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+  </section>
+
+  <!-- Comparison -->
+  <section class="comparison" id="compare">
+    <div class="container">
+      <div class="section-header">
+        <h2>Why Kitchen Pro Stands Out</h2>
+        <p>A quick look at what makes us different.</p>
+      </div>
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th>Feature</th>
+            
+            <th>Ultimate Chef Knife</th>
+            
+            <th>Professional Cutting</th>
+            
+          </tr>
+        </thead>
+        <tbody>
+          
+          <tr>
+            <td><strong>Quality Rating</strong></td>
+            {{#values}}
+            <td>[object Object]</td>
+            {{/values}}
+          </tr>
+          
+          <tr>
+            <td><strong>Prime Eligible</strong></td>
+            {{#values}}
+            <td>[object Object]</td>
+            {{/values}}
+          </tr>
+          
+          <tr>
+            <td><strong>Free Returns</strong></td>
+            {{#values}}
+            <td>[object Object]</td>
+            {{/values}}
+          </tr>
+          
+          <tr>
+            <td><strong>Our Pick</strong></td>
+            {{#values}}
+            <td>[object Object]</td>
+            {{/values}}
+          </tr>
+          
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section class="testimonials" id="reviews">
+    <div class="container">
+      <div class="section-header">
+        <h2>Customer Reviews</h2>
+        <p>Hear from our satisfied customers.</p>
+      </div>
+      <div class="testimonials-grid">
+        
+        <div class="testimonial-card">
+          <p class="testimonial-text">"The Ultimate Chef Knife has completely changed how I cook. It's incredibly sharp and feels great in my hand!"</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">E</div>
+            <div>
+              <div class="testimonial-name">Emily R.</div>
+              <div class="testimonial-title">Verified Buyer</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="testimonial-card">
+          <p class="testimonial-text">"I can't believe how much easier my meal prep has become with the Professional Cutting Board. Highly recommend!"</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">M</div>
+            <div>
+              <div class="testimonial-name">Michael T.</div>
+              <div class="testimonial-title">Happy Customer</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="testimonial-card">
+          <p class="testimonial-text">"Kitchen Pro products are a game changer. The quality is outstanding and worth every penny."</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">S</div>
+            <div>
+              <div class="testimonial-name">Sarah L.</div>
+              <div class="testimonial-title">Satisfied User</div>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-section">
+    <div class="container">
+      <h2>Don't Miss Out!</h2>
+      <p>Limited time offer on our best-selling kitchen products. Upgrade your cooking game today!</p>
+      <a href="https://www.amazon.com/dp/B00FU6PDLU?tag=kitchenpro-20" class="btn" target="_blank" rel="nofollow noopener">
+        Shop Now
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="/" class="logo"><img src="assets/logo.png" alt="Kitchen Pro" class="logo-img"></a>
+          <p>Kitchen Pro produces kitchen products</p>
+        </div>
+        <div class="footer-column">
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#products">Products</a></li>
+            <li><a href="#compare">Compare</a></li>
+            <li><a href="#reviews">Reviews</a></li>
+          </ul>
+        </div>
+        <div class="footer-column">
+          <h4>Support</h4>
+          <ul>
+            <li><a href="#">Contact Us</a></li>
+            <li><a href="#">FAQ</a></li>
+            <li><a href="#">Shipping Info</a></li>
+            <li><a href="#">Returns</a></li>
+          </ul>
+        </div>
+        <div class="footer-column">
+          <h4>Legal</h4>
+          <ul>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms of Service</a></li>
+            <li><a href="#">Affiliate Disclosure</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="affiliate-disclosure">
+        <strong>Affiliate Disclosure:</strong> Kitchen Pro is a participant in the Amazon Services LLC Associates Program, an affiliate advertising program designed to provide a means for sites to earn advertising fees by advertising and linking to Amazon.com. As an Amazon Associate, we earn from qualifying purchases.
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; 2026 Kitchen Pro. All rights reserved.</p>
+        <p>As an Amazon Associate, we earn from qualifying purchases.</p>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

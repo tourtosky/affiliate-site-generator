@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { prisma } from '../index.js';
 import { blockRegistry, getBlockDefinition } from '../data/blockRegistry.js';
+import { generateDefaultLayouts } from '../data/templateDefaults.js';
 
 export const blocksRouter = Router();
 
@@ -23,15 +24,20 @@ blocksRouter.get('/:id', (req, res) => {
 blocksRouter.get('/projects/:projectId/layout', async (req, res) => {
   const project = await prisma.project.findUnique({
     where: { id: req.params.projectId },
-    select: { pageLayouts: true, selectedPages: true },
+    select: { pageLayouts: true, selectedPages: true, template: true },
   });
 
   if (!project) {
     return res.status(404).json({ error: 'Project not found' });
   }
 
-  const pageLayouts = JSON.parse(project.pageLayouts || '{}');
-  const selectedPages = JSON.parse(project.selectedPages || '[]');
+  const selectedPages = JSON.parse(project.selectedPages || '[]') as string[];
+  let pageLayouts = JSON.parse(project.pageLayouts || '{}');
+
+  // Auto-populate with template defaults if pageLayouts is empty
+  if (Object.keys(pageLayouts).length === 0 && selectedPages.length > 0) {
+    pageLayouts = generateDefaultLayouts(project.template, selectedPages);
+  }
 
   res.json({ pageLayouts, selectedPages });
 });
