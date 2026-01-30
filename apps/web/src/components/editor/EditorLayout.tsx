@@ -24,10 +24,36 @@ import { EditorCanvas } from './EditorCanvas';
 import { PropertiesPanel } from './PropertiesPanel';
 import { PageSwitcher } from './PageSwitcher';
 import { getBlockComponent } from './blocks';
+import { EditorProvider, type ProjectContext } from './EditorContext';
 
 interface LayoutResponse {
   pageLayouts: PageLayouts;
   selectedPages: string[];
+}
+
+interface ProjectResponse {
+  id: string;
+  brandName: string;
+  brandDescription: string | null;
+  brandColors: string;
+  logoUrl: string | null;
+  products: Array<{
+    id: string;
+    asin: string;
+    title: string | null;
+    customTitle: string | null;
+    customDescription: string | null;
+    imageUrl: string | null;
+    generatedTitle: string | null;
+    generatedDescription: string | null;
+  }>;
+  ctas: Array<{
+    id: string;
+    name: string;
+    label: string;
+    style: string;
+    linkType: string;
+  }>;
 }
 
 export function EditorLayout() {
@@ -64,11 +90,32 @@ export function EditorLayout() {
   });
 
   // Fetch project layout
-  const { data: layoutData, isLoading } = useQuery<LayoutResponse>({
+  const { data: layoutData, isLoading: layoutLoading } = useQuery<LayoutResponse>({
     queryKey: ['project-layout', projectId],
     queryFn: () => api.get(`/projects/${projectId}/layout`),
     enabled: !!projectId,
   });
+
+  // Fetch full project data for block previews
+  const { data: projectData, isLoading: projectLoading } = useQuery<ProjectResponse>({
+    queryKey: ['project', projectId],
+    queryFn: () => api.get(`/projects/${projectId}`),
+    enabled: !!projectId,
+  });
+
+  const isLoading = layoutLoading || projectLoading;
+
+  // Transform project data for context
+  const projectContext: ProjectContext | null = projectData
+    ? {
+        brandName: projectData.brandName,
+        brandDescription: projectData.brandDescription,
+        brandColors: JSON.parse(projectData.brandColors || '{"primary":"#2563eb","secondary":"#1e40af","accent":"#f59e0b"}'),
+        logoUrl: projectData.logoUrl,
+        products: projectData.products || [],
+        ctas: projectData.ctas || [],
+      }
+    : null;
 
   // Initialize editor when data loads
   useEffect(() => {
@@ -171,63 +218,65 @@ export function EditorLayout() {
   };
 
   return (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={closestCenter}
-      onDragStart={handleDragStart}
-      onDragEnd={handleDragEnd}
-    >
-      <div className="h-screen flex flex-col">
-        {/* Header */}
-        <header className="h-14 border-b bg-white flex items-center justify-between px-4">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="sm" onClick={() => navigate(`/projects/${projectId}`)}>
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back
-            </Button>
-            <PageSwitcher
-              currentPage={currentPage}
-              availablePages={availablePages}
-              onChange={setCurrentPage}
+    <EditorProvider project={projectContext}>
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+      >
+        <div className="h-screen flex flex-col">
+          {/* Header */}
+          <header className="h-14 border-b bg-white flex items-center justify-between px-4">
+            <div className="flex items-center gap-4">
+              <Button variant="ghost" size="sm" onClick={() => navigate(`/projects/${projectId}`)}>
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back
+              </Button>
+              <PageSwitcher
+                currentPage={currentPage}
+                availablePages={availablePages}
+                onChange={setCurrentPage}
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              {isDirty && <span className="text-sm text-orange-500">Unsaved changes</span>}
+              <Button
+                size="sm"
+                onClick={() => saveMutation.mutate(pageLayouts)}
+                disabled={!isDirty || isSaving}
+              >
+                {isSaving ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <Save className="h-4 w-4 mr-2" />
+                )}
+                Save
+              </Button>
+            </div>
+          </header>
+
+          {/* Main editor area */}
+          <div className="flex-1 flex overflow-hidden">
+            <BlockPalette blocks={blockDefinitions} />
+            <EditorCanvas
+              blocks={getCurrentPageBlocks()}
+              selectedBlockId={selectedBlockId}
+              onSelectBlock={selectBlock}
+              onDeleteBlock={removeBlock}
+            />
+            <PropertiesPanel
+              block={selectedBlock}
+              blockDefinition={selectedBlockDef ?? null}
+              onUpdateProperties={(props) =>
+                selectedBlockId && updateBlockProperties(selectedBlockId, props)
+              }
             />
           </div>
-          <div className="flex items-center gap-2">
-            {isDirty && <span className="text-sm text-orange-500">Unsaved changes</span>}
-            <Button
-              size="sm"
-              onClick={() => saveMutation.mutate(pageLayouts)}
-              disabled={!isDirty || isSaving}
-            >
-              {isSaving ? (
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              ) : (
-                <Save className="h-4 w-4 mr-2" />
-              )}
-              Save
-            </Button>
-          </div>
-        </header>
-
-        {/* Main editor area */}
-        <div className="flex-1 flex overflow-hidden">
-          <BlockPalette blocks={blockDefinitions} />
-          <EditorCanvas
-            blocks={getCurrentPageBlocks()}
-            selectedBlockId={selectedBlockId}
-            onSelectBlock={selectBlock}
-            onDeleteBlock={removeBlock}
-          />
-          <PropertiesPanel
-            block={selectedBlock}
-            blockDefinition={selectedBlockDef ?? null}
-            onUpdateProperties={(props) =>
-              selectedBlockId && updateBlockProperties(selectedBlockId, props)
-            }
-          />
         </div>
-      </div>
 
-      <DragOverlay>{renderDragOverlay()}</DragOverlay>
-    </DndContext>
+        <DragOverlay>{renderDragOverlay()}</DragOverlay>
+      </DndContext>
+    </EditorProvider>
   );
 }

@@ -1,4 +1,5 @@
 import { Facebook, Twitter, Instagram } from 'lucide-react';
+import { useProjectContext } from '../EditorContext';
 
 interface FooterBlockProps {
   properties: {
@@ -9,7 +10,10 @@ interface FooterBlockProps {
 }
 
 export function FooterBlock({ properties }: FooterBlockProps) {
-  const { copyright = '© 2024 All rights reserved', showSocialLinks = true, columns = 3 } = properties;
+  const project = useProjectContext();
+  const year = new Date().getFullYear();
+  const defaultCopyright = `© ${year} ${project.brandName}. All rights reserved`;
+  const { copyright = defaultCopyright, showSocialLinks = true, columns = 3 } = properties;
 
   return (
     <div className="bg-gray-900 text-white rounded-lg p-6">

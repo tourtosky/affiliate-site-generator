@@ -1,4 +1,5 @@
 import { Shield, RefreshCw, Truck, Headphones } from 'lucide-react';
+import { useProjectContext } from '../EditorContext';
 
 interface TrustBadgesBlockProps {
   properties: {
@@ -11,6 +12,7 @@ interface TrustBadgesBlockProps {
 }
 
 export function TrustBadgesBlock({ properties }: TrustBadgesBlockProps) {
+  const project = useProjectContext();
   const {
     showSecurePayment = true,
     showMoneyBack = true,
@@ -33,7 +35,7 @@ export function TrustBadgesBlock({ properties }: TrustBadgesBlockProps) {
       >
         {badges.map((badge, i) => (
           <div key={i} className="flex flex-col items-center gap-2 text-center">
-            <badge.icon className="h-8 w-8 text-green-600" />
+            <badge.icon className="h-8 w-8" style={{ color: project.brandColors.primary }} />
             <span className="text-sm font-medium">{badge.label}</span>
           </div>
         ))}

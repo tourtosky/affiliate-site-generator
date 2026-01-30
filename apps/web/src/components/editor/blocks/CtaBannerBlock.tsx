@@ -1,4 +1,5 @@
-import { MousePointer } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
+import { useProjectContext } from '../EditorContext';
 
 interface CtaBannerBlockProps {
   properties: {
@@ -10,20 +11,36 @@ interface CtaBannerBlockProps {
 }
 
 export function CtaBannerBlock({ properties }: CtaBannerBlockProps) {
-  const { style = 'primary', text } = properties;
+  const project = useProjectContext();
+  const { style = 'primary', text, ctaId } = properties;
 
-  const bgColors = {
-    primary: 'bg-blue-600',
-    secondary: 'bg-gray-800',
-    accent: 'bg-orange-500',
+  // Find CTA by ID if specified
+  const cta = ctaId ? project.ctas.find((c) => c.id === ctaId) : null;
+  const buttonLabel = cta?.label || 'Shop Now';
+
+  // Map style to project colors
+  const getBackgroundColor = () => {
+    switch (style) {
+      case 'accent':
+        return project.brandColors.accent;
+      case 'secondary':
+        return project.brandColors.secondary;
+      default:
+        return project.brandColors.primary;
+    }
   };
 
+  const displayText = text || `Don't miss out on ${project.brandName}'s best products!`;
+
   return (
-    <div className={`${bgColors[style]} text-white p-6 rounded-lg text-center`}>
-      <p className="mb-3">{text || 'Special offer! Get 20% off today!'}</p>
-      <button className="bg-white text-gray-900 px-6 py-2 rounded font-medium inline-flex items-center gap-2">
-        <MousePointer className="h-4 w-4" />
-        Shop Now
+    <div
+      className="text-white p-6 rounded-lg text-center"
+      style={{ backgroundColor: getBackgroundColor() }}
+    >
+      <p className="mb-4 text-lg">{displayText}</p>
+      <button className="bg-white text-gray-900 px-6 py-3 rounded font-semibold inline-flex items-center gap-2 hover:bg-gray-100 transition-colors">
+        {buttonLabel}
+        <ArrowRight className="h-4 w-4" />
       </button>
     </div>
   );

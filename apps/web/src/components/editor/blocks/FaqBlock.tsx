@@ -1,4 +1,5 @@
 import { ChevronDown } from 'lucide-react';
+import { useProjectContext } from '../EditorContext';
 
 interface FaqBlockProps {
   properties: {
@@ -9,7 +10,8 @@ interface FaqBlockProps {
 }
 
 export function FaqBlock({ properties }: FaqBlockProps) {
-  const { heading = 'FAQ', items } = properties;
+  const project = useProjectContext();
+  const { heading = `${project.brandName} FAQ`, items } = properties;
 
   let faqItems: { question: string; answer: string }[] = [];
   try {

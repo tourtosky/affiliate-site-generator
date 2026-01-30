@@ -1,4 +1,5 @@
 import { Star, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { useProjectContext } from '../EditorContext';
 
 interface ReviewSummaryBlockProps {
   properties: {
@@ -10,7 +11,15 @@ interface ReviewSummaryBlockProps {
 }
 
 export function ReviewSummaryBlock({ properties }: ReviewSummaryBlockProps) {
-  const { showProscons, rating = 4, verdict } = properties;
+  const project = useProjectContext();
+  const { productId, showProscons, rating = 4, verdict } = properties;
+
+  // Find selected product or use first product for context
+  const product = productId
+    ? project.products.find((p) => p.id === productId)
+    : project.products[0];
+
+  const productName = product?.customTitle || product?.generatedTitle || product?.title || 'this product';
 
   return (
     <div className="bg-white border rounded-lg p-6">
@@ -55,7 +64,7 @@ export function ReviewSummaryBlock({ properties }: ReviewSummaryBlockProps) {
       {verdict && (
         <div className="bg-gray-50 rounded p-3">
           <div className="font-medium mb-1">Verdict</div>
-          <p className="text-sm text-gray-600">{verdict}</p>
+          <p className="text-sm text-gray-600">{verdict || `Overall, ${productName} delivers excellent value.`}</p>
         </div>
       )}
     </div>
