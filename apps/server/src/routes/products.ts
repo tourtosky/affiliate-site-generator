@@ -15,9 +15,9 @@ const createProductSchema = z.object({
 
 const updateProductSchema = z.object({
   title: z.string().optional(),
-  customTitle: z.string().optional(),
-  customDescription: z.string().optional(),
-  imageUrl: z.string().url().optional().nullable(),
+  customTitle: z.string().optional().nullable(),
+  customDescription: z.string().optional().nullable(),
+  imageUrl: z.union([z.string().url(), z.literal(''), z.null()]).optional(),
   generateImage: z.boolean().optional(),
   sortOrder: z.number().optional(),
 });

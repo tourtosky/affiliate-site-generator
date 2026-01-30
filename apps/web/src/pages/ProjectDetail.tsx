@@ -1293,12 +1293,19 @@ function ProjectProducts({ project }: { project: Project }) {
   });
 
   const updateProductMutation = useMutation({
-    mutationFn: ({ productId, data }: { productId: string; data: Partial<ProductFormData> }) =>
-      api.put(`/projects/${project.id}/products/${productId}`, {
-        customTitle: data.customTitle || null,
-        customDescription: data.customDescription || null,
-        imageUrl: data.imageUrl || null,
-      }),
+    mutationFn: ({ productId, data }: { productId: string; data: Partial<ProductFormData> }) => {
+      // Only include fields that have values, use undefined for empty strings
+      const payload: Record<string, string | null | undefined> = {};
+      payload.customTitle = data.customTitle?.trim() || undefined;
+      payload.customDescription = data.customDescription?.trim() || undefined;
+      // For imageUrl, send null to clear it, or the URL if valid
+      if (data.imageUrl?.trim()) {
+        payload.imageUrl = data.imageUrl.trim();
+      } else {
+        payload.imageUrl = null;
+      }
+      return api.put(`/projects/${project.id}/products/${productId}`, payload);
+    },
     onSuccess: () => {
       toast({ title: 'Product updated successfully' });
       queryClient.invalidateQueries({ queryKey: ['project', project.id] });
@@ -1526,11 +1533,12 @@ function ProjectCTAs({ project }: { project: Project }) {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [name, setName] = useState('');
   const [label, setLabel] = useState('');
+  const [customUrl, setCustomUrl] = useState('');
   const [placement, setPlacement] = useState<string>('');
   const queryClient = useQueryClient();
 
   const addCTAMutation = useMutation({
-    mutationFn: (data: { name: string; label: string; placement: string }) =>
+    mutationFn: (data: { name: string; label: string; placement: string; customUrl?: string }) =>
       api.post(`/projects/${project.id}/ctas`, data),
     onSuccess: () => {
       toast({ title: 'CTA added successfully' });
@@ -1538,6 +1546,7 @@ function ProjectCTAs({ project }: { project: Project }) {
       setIsAddDialogOpen(false);
       setName('');
       setLabel('');
+      setCustomUrl('');
       setPlacement('');
     },
     onError: (error: Error) => {
@@ -1559,7 +1568,15 @@ function ProjectCTAs({ project }: { project: Project }) {
   const handleAddCTA = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || !label.trim() || !placement) return;
-    addCTAMutation.mutate({ name: name.trim(), label: label.trim(), placement });
+    const data: { name: string; label: string; placement: string; customUrl?: string } = {
+      name: name.trim(),
+      label: label.trim(),
+      placement,
+    };
+    if (customUrl.trim()) {
+      data.customUrl = customUrl.trim();
+    }
+    addCTAMutation.mutate(data);
   };
 
   const isFormValid = name.trim() && label.trim() && placement;
@@ -1609,6 +1626,19 @@ function ProjectCTAs({ project }: { project: Project }) {
                     />
                     <p className="text-xs text-muted-foreground">
                       The text displayed on the button.
+                    </p>
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="cta-url">Link URL</Label>
+                    <Input
+                      id="cta-url"
+                      placeholder="e.g., https://amazon.com/dp/..."
+                      value={customUrl}
+                      onChange={(e) => setCustomUrl(e.target.value)}
+                      disabled={addCTAMutation.isPending}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      The URL the button links to.
                     </p>
                   </div>
                   <div className="grid gap-2">

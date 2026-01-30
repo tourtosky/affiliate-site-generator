@@ -56,6 +56,13 @@ interface RenderContext {
   // CTA Section
   ctaSectionTitle: string;
   ctaSectionDescription: string;
+  // CTAs from database
+  ctas: Array<{
+    name: string;
+    label: string;
+    placement: string;
+    customUrl?: string | null;
+  }>;
 }
 
 // Map block types to their HTML render functions
@@ -98,6 +105,12 @@ function renderHero(ctx: RenderContext, props: Record<string, unknown>): string 
   const title = (props.title as string) || ctx.heroTitle;
   const subtitle = (props.subtitle as string) || ctx.heroDescription;
 
+  // Find hero-secondary CTA
+  const secondaryCta = ctx.ctas.find(cta => cta.placement === 'hero-secondary');
+  const secondaryLabel = secondaryCta?.label || 'View Products';
+  const secondaryUrl = secondaryCta?.customUrl || '#products';
+  const isExternal = secondaryCta?.customUrl && !secondaryCta.customUrl.startsWith('#');
+
   return `
   <!-- Hero -->
   <section class="hero">
@@ -111,7 +124,7 @@ function renderHero(ctx: RenderContext, props: Record<string, unknown>): string 
             ${ctx.mainCtaLabel}
             <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </a>
-          <a href="#products" class="btn btn-outline">View Products</a>
+          <a href="${secondaryUrl}" class="btn btn-outline"${isExternal ? ' target="_blank" rel="nofollow noopener"' : ''}>${secondaryLabel}</a>
         </div>
       </div>
     </div>
@@ -156,10 +169,6 @@ function renderProducts(ctx: RenderContext, props: Record<string, unknown>): str
           <div class="product-content">
             <h3>${p.title}</h3>
             <p>${p.description}</p>
-            <div class="product-meta">
-              <span class="product-rating">★★★★★ ${p.rating}</span>
-              <span class="product-price">${p.price}</span>
-            </div>
             <a href="${p.affiliateUrl}" class="product-cta" target="_blank" rel="nofollow noopener sponsored">
               ${p.ctaLabel}
             </a>

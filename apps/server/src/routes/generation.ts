@@ -586,6 +586,12 @@ async function processGeneration(
         testimonials: templateData.testimonials as RenderContext['testimonials'],
         ctaSectionTitle: templateData.ctaSectionTitle as string,
         ctaSectionDescription: templateData.ctaSectionDescription as string,
+        ctas: project.ctas.map(cta => ({
+          name: cta.name,
+          label: cta.label,
+          placement: cta.placement,
+          customUrl: cta.customUrl,
+        })),
       };
 
       // Render blocks to HTML
