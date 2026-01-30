@@ -593,7 +593,14 @@ async function processGeneration(
 
       // Get just the CSS from the template (everything between <style> tags)
       const styleMatch = templateHtml.match(/<style>([\s\S]*?)<\/style>/);
-      const styles = styleMatch ? styleMatch[1] : '';
+      let styles = styleMatch ? styleMatch[1] : '';
+
+      // Replace CSS variables in the styles
+      styles = styles
+        .replace(/\{\{primaryColor\}\}/g, renderContext.primaryColor)
+        .replace(/\{\{primaryDark\}\}/g, renderContext.primaryDark)
+        .replace(/\{\{secondaryColor\}\}/g, renderContext.secondaryColor)
+        .replace(/\{\{accentColor\}\}/g, renderContext.accentColor);
 
       // Build the complete HTML document
       indexHtml = `<!DOCTYPE html>

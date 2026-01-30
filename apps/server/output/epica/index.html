@@ -10,13 +10,14 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
+    
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --primary: #2563eb;
-      --primary-dark: #003dc5;
-      --secondary: #1e40af;
-      --accent: #f59e0b;
+      --primary: {{primaryColor}};
+      --primary-dark: {{primaryDark}};
+      --secondary: {{secondaryColor}};
+      --accent: {{accentColor}};
       --text: #1a1a1a;
       --text-muted: #6b7280;
       --bg: #ffffff;
@@ -104,7 +105,7 @@
       content: '';
       position: absolute;
       inset: 0;
-      background: url('https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1600&auto=format') center/cover;
+      background: url('{{heroImage}}') center/cover;
       opacity: 0.3;
     }
 
@@ -523,9 +524,29 @@
       .comparison-table { font-size: 0.875rem; }
       .comparison-table th, .comparison-table td { padding: 12px 16px; }
     }
+  
   </style>
 </head>
 <body>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-content">
+        <span class="hero-badge">TOP RATED 2024</span>
+        <h1>Discover the Best Epica Products</h1>
+        <p>We've researched and tested the top products to help you make the right choice. Find expert reviews, comparisons, and the best deals.</p>
+        <div class="hero-buttons">
+          <a href="#products" class="btn btn-primary" target="_blank" rel="nofollow noopener">
+            Shop Now on Amazon
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+          <a href="#products" class="btn btn-outline">View Products</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- Header -->
   <header class="header">
     <div class="container header-inner">
@@ -539,24 +560,6 @@
       <a href="#products" class="header-cta" target="_blank" rel="nofollow noopener">Shop Now on Amazon</a>
     </div>
   </header>
-
-  <!-- Hero -->
-  <section class="hero">
-    <div class="container">
-      <div class="hero-content">
-        <span class="hero-badge">Top Rated Products</span>
-        <h1>Discover the Best Epica Products</h1>
-        <p>We've researched and tested the top products to help you make the right choice. Find expert reviews, comparisons, and the best deals.</p>
-        <div class="hero-buttons">
-          <a href="#products" class="btn btn-primary" target="_blank" rel="nofollow noopener">
-            Shop Now on Amazon
-            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </a>
-          <a href="#products" class="btn btn-outline">View Products</a>
-        </div>
-      </div>
-    </div>
-  </section>
 
   <!-- Features -->
   <section class="features" id="features">
@@ -572,25 +575,21 @@
           <h3>Premium Quality</h3>
           <p>Epica products are carefully selected for quality and durability.</p>
         </div>
-        
         <div class="feature-card">
           <div class="feature-icon">✓</div>
           <h3>Expert Reviews</h3>
           <p>Our team thoroughly tests and reviews each product before recommendation.</p>
         </div>
-        
         <div class="feature-card">
           <div class="feature-icon">⚡</div>
           <h3>Fast Shipping</h3>
           <p>All products are available with Amazon Prime for quick delivery.</p>
         </div>
-        
         <div class="feature-card">
           <div class="feature-icon">🛡️</div>
           <h3>Buyer Protection</h3>
           <p>Shop with confidence through Amazon's trusted marketplace.</p>
         </div>
-        
       </div>
     </div>
   </section>
@@ -626,32 +625,20 @@
           
           <tr>
             <td><strong>Quality Rating</strong></td>
-            {{#values}}
-            <td>[object Object]</td>
-            {{/values}}
+            
           </tr>
-          
           <tr>
             <td><strong>Prime Eligible</strong></td>
-            {{#values}}
-            <td>[object Object]</td>
-            {{/values}}
+            
           </tr>
-          
           <tr>
             <td><strong>Free Returns</strong></td>
-            {{#values}}
-            <td>[object Object]</td>
-            {{/values}}
+            
           </tr>
-          
           <tr>
             <td><strong>Our Pick</strong></td>
-            {{#values}}
-            <td>[object Object]</td>
-            {{/values}}
+            
           </tr>
-          
         </tbody>
       </table>
     </div>
@@ -676,7 +663,6 @@
             </div>
           </div>
         </div>
-        
         <div class="testimonial-card">
           <p class="testimonial-text">"Great selection and honest reviews. Epica helped me find exactly what I needed without the hassle."</p>
           <div class="testimonial-author">
@@ -687,7 +673,6 @@
             </div>
           </div>
         </div>
-        
         <div class="testimonial-card">
           <p class="testimonial-text">"The comparison guides saved me hours of research. Highly recommend checking out their product picks!"</p>
           <div class="testimonial-author">
@@ -698,7 +683,6 @@
             </div>
           </div>
         </div>
-        
       </div>
     </div>
   </section>
