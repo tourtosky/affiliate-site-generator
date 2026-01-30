@@ -6,6 +6,8 @@ import fs from 'fs/promises';
 import { createWriteStream } from 'fs';
 import archiver from 'archiver';
 import * as aiProvider from '../services/ai/provider.js';
+import { renderBlocksToHtml, type RenderContext } from '../services/blockRenderer.js';
+import type { PageLayouts } from '@affiliate/shared';
 
 export const generationRouter = Router();
 
@@ -535,7 +537,90 @@ async function processGeneration(
       message: 'Building HTML pages...',
     });
 
-    const indexHtml = renderTemplate(templateHtml, templateData);
+    // Check if project has custom pageLayouts (from block editor)
+    let indexHtml: string;
+    const pageLayouts: PageLayouts = JSON.parse(project.pageLayouts || '{}');
+    const homeLayout = pageLayouts['home'];
+
+    if (homeLayout && homeLayout.blocks && homeLayout.blocks.length > 0) {
+      // Use block renderer to generate HTML based on editor layout
+      console.log(`Using block layout with ${homeLayout.blocks.length} blocks`);
+
+      // Sort blocks by order
+      const sortedBlocks = [...homeLayout.blocks].sort((a, b) => a.order - b.order);
+
+      // Prepare render context
+      const renderContext: RenderContext = {
+        brandName: project.brandName,
+        brandDescription: templateData.brandDescription as string,
+        primaryColor: templateData.primaryColor as string,
+        primaryDark: templateData.primaryDark as string,
+        secondaryColor: templateData.secondaryColor as string,
+        accentColor: templateData.accentColor as string,
+        logoUrl: templateData.logoUrl as string | null,
+        faviconUrl: templateData.faviconUrl as string | null,
+        hasLogo: templateData.hasLogo as boolean,
+        hasFavicon: templateData.hasFavicon as boolean,
+        metaDescription: templateData.metaDescription as string,
+        tagline: templateData.tagline as string,
+        year: templateData.year as number,
+        affiliateDisclosure: templateData.affiliateDisclosure as string,
+        heroBadge: templateData.heroBadge as string,
+        heroTitle: templateData.heroTitle as string,
+        heroDescription: templateData.heroDescription as string,
+        heroImage: templateData.heroImage as string,
+        mainCtaLabel: templateData.mainCtaLabel as string,
+        mainCtaUrl: templateData.mainCtaUrl as string,
+        featuresTitle: templateData.featuresTitle as string,
+        featuresSubtitle: templateData.featuresSubtitle as string,
+        features: templateData.features as RenderContext['features'],
+        productsTitle: templateData.productsTitle as string,
+        productsSubtitle: templateData.productsSubtitle as string,
+        products: templateData.products as RenderContext['products'],
+        comparisonTitle: templateData.comparisonTitle as string,
+        comparisonSubtitle: templateData.comparisonSubtitle as string,
+        comparisonProducts: templateData.comparisonProducts as RenderContext['comparisonProducts'],
+        comparisonFeatures: templateData.comparisonFeatures as RenderContext['comparisonFeatures'],
+        testimonialsTitle: templateData.testimonialsTitle as string,
+        testimonialsSubtitle: templateData.testimonialsSubtitle as string,
+        testimonials: templateData.testimonials as RenderContext['testimonials'],
+        ctaSectionTitle: templateData.ctaSectionTitle as string,
+        ctaSectionDescription: templateData.ctaSectionDescription as string,
+      };
+
+      // Render blocks to HTML
+      const bodyContent = renderBlocksToHtml(sortedBlocks, renderContext);
+
+      // Get just the CSS from the template (everything between <style> tags)
+      const styleMatch = templateHtml.match(/<style>([\s\S]*?)<\/style>/);
+      const styles = styleMatch ? styleMatch[1] : '';
+
+      // Build the complete HTML document
+      indexHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="${renderContext.metaDescription}">
+  <title>${renderContext.brandName} - ${renderContext.tagline}</title>
+  ${renderContext.hasFavicon ? `<link rel="icon" type="image/x-icon" href="${renderContext.faviconUrl}">` : ''}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    ${styles}
+  </style>
+</head>
+<body>
+${bodyContent}
+</body>
+</html>`;
+    } else {
+      // Fall back to static template rendering
+      console.log('Using static template (no block layout)');
+      indexHtml = renderTemplate(templateHtml, templateData);
+    }
+
     const htmlPath = path.join(outputDir, 'index.html');
     await fs.writeFile(htmlPath, indexHtml);
 
