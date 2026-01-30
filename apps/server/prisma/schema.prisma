@@ -33,6 +33,10 @@ model Project {
   languages         String   @default("[\"en\"]") // JSON array
   defaultLanguage   String   @default("en")
 
+  // Uploaded assets
+  logoUrl           String?
+  faviconUrl        String?
+
   // Assets config (stored as JSON)
   assetsConfig      String   @default("{\"generateLogo\":true,\"generateFavicon\":true,\"generateOgImage\":true}")
 

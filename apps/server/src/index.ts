@@ -8,10 +8,12 @@ import { PrismaClient } from '@prisma/client';
 import { projectsRouter } from './routes/projects.js';
 import { productsRouter } from './routes/products.js';
 import { ctaRouter } from './routes/cta.js';
+import { domainsRouter } from './routes/domains.js';
 import { generationRouter } from './routes/generation.js';
 import { settingsRouter } from './routes/settings.js';
 import { templatesRouter } from './routes/templates.js';
 import { infrastructureRouter } from './routes/infrastructure.js';
+import { uploadsRouter } from './routes/uploads.js';
 
 const app = express();
 const httpServer = createServer(app);
@@ -44,10 +46,12 @@ app.get('/api/health', (_req, res) => {
 app.use('/api/projects', projectsRouter);
 app.use('/api/projects', productsRouter);
 app.use('/api/projects', ctaRouter);
+app.use('/api/projects', domainsRouter);
 app.use('/api/projects', generationRouter);
 app.use('/api/settings', settingsRouter);
 app.use('/api/templates', templatesRouter);
 app.use('/api/infrastructure', infrastructureRouter);
+app.use('/api/projects', uploadsRouter);
 
 // Socket.IO connection handling
 io.on('connection', (socket) => {

@@ -98,7 +98,7 @@ export function Templates() {
           </div>
         ) : (
           <div className="space-y-6">
-            {['hero', 'products', 'content', 'cta', 'footer'].map((category) => {
+            {['hero', 'products', 'reviews', 'content', 'cta', 'navigation', 'footer'].map((category) => {
               const categoryBlocks = blocks?.filter((b) => b.category === category) || [];
               if (categoryBlocks.length === 0) return null;
 

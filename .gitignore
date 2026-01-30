@@ -49,6 +49,10 @@ yarn-error.log*
 output/*
 !output/.gitkeep
 
+# Uploads
+apps/server/uploads/*
+!apps/server/uploads/.gitkeep
+
 # Test
 coverage
 

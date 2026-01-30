@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, Upload, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -56,6 +56,40 @@ const templates = [
 export function ProjectCreate() {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [faviconFile, setFaviconFile] = useState<File | null>(null);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [faviconPreview, setFaviconPreview] = useState<string | null>(null);
+  const logoInputRef = useRef<HTMLInputElement>(null);
+  const faviconInputRef = useRef<HTMLInputElement>(null);
+
+  const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setLogoFile(file);
+      setLogoPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleFaviconChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setFaviconFile(file);
+      setFaviconPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const clearLogo = () => {
+    setLogoFile(null);
+    setLogoPreview(null);
+    if (logoInputRef.current) logoInputRef.current.value = '';
+  };
+
+  const clearFavicon = () => {
+    setFaviconFile(null);
+    setFaviconPreview(null);
+    if (faviconInputRef.current) faviconInputRef.current.value = '';
+  };
 
   const form = useForm<CreateProjectForm>({
     resolver: zodResolver(createProjectSchema),
@@ -77,7 +111,35 @@ export function ProjectCreate() {
 
   const createMutation = useMutation({
     mutationFn: (data: CreateProjectForm) => api.post<{ id: string }>('/projects', data),
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
+      // Upload logo if selected
+      if (logoFile) {
+        const logoFormData = new FormData();
+        logoFormData.append('logo', logoFile);
+        try {
+          await fetch(`/api/projects/${data.id}/upload/logo`, {
+            method: 'POST',
+            body: logoFormData,
+          });
+        } catch {
+          console.error('Failed to upload logo');
+        }
+      }
+
+      // Upload favicon if selected
+      if (faviconFile) {
+        const faviconFormData = new FormData();
+        faviconFormData.append('favicon', faviconFile);
+        try {
+          await fetch(`/api/projects/${data.id}/upload/favicon`, {
+            method: 'POST',
+            body: faviconFormData,
+          });
+        } catch {
+          console.error('Failed to upload favicon');
+        }
+      }
+
       toast({ title: 'Project created successfully' });
       navigate(`/projects/${data.id}`);
     },
@@ -282,6 +344,65 @@ export function ProjectCreate() {
                     />
                   </div>
                 </div>
+              </div>
+              <div className="space-y-2">
+                <Label>Branding Assets (Optional)</Label>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-xs">Logo</Label>
+                    <div className="border-2 border-dashed rounded-lg p-4">
+                      {logoPreview ? (
+                        <div className="flex items-center gap-3">
+                          <img src={logoPreview} alt="Logo preview" className="h-12 w-auto max-w-[120px] object-contain" />
+                          <Button type="button" variant="ghost" size="sm" onClick={clearLogo} className="text-destructive">
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ) : (
+                        <label className="flex flex-col items-center gap-2 cursor-pointer py-2">
+                          <Upload className="h-6 w-6 text-muted-foreground" />
+                          <span className="text-xs text-muted-foreground">Upload logo</span>
+                          <input
+                            ref={logoInputRef}
+                            type="file"
+                            accept="image/png,image/jpeg,image/gif,image/webp,image/svg+xml"
+                            className="hidden"
+                            onChange={handleLogoChange}
+                          />
+                        </label>
+                      )}
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs">Favicon</Label>
+                    <div className="border-2 border-dashed rounded-lg p-4">
+                      {faviconPreview ? (
+                        <div className="flex items-center gap-3">
+                          <img src={faviconPreview} alt="Favicon preview" className="h-8 w-8 object-contain" />
+                          <span className="text-xs text-muted-foreground">Selected</span>
+                          <Button type="button" variant="ghost" size="sm" onClick={clearFavicon} className="text-destructive">
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ) : (
+                        <label className="flex flex-col items-center gap-2 cursor-pointer py-2">
+                          <Upload className="h-6 w-6 text-muted-foreground" />
+                          <span className="text-xs text-muted-foreground">Upload favicon</span>
+                          <input
+                            ref={faviconInputRef}
+                            type="file"
+                            accept="image/png,image/x-icon,image/vnd.microsoft.icon,image/svg+xml"
+                            className="hidden"
+                            onChange={handleFaviconChange}
+                          />
+                        </label>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  You can also upload these later from the project settings.
+                </p>
               </div>
             </>
           )}
