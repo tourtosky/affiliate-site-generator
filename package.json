@@ -1,0 +1,30 @@
+{
+  "name": "affiliate-site-generator",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev",
+    "dev:server": "turbo run dev --filter=@affiliate/server",
+    "dev:web": "turbo run dev --filter=@affiliate/web",
+    "build": "turbo run build",
+    "start": "turbo run start",
+    "lint": "turbo run lint",
+    "db:push": "npm run db:push --workspace=@affiliate/server",
+    "db:generate": "npm run db:generate --workspace=@affiliate/server",
+    "db:seed": "npm run db:seed --workspace=@affiliate/server",
+    "db:studio": "npm run db:studio --workspace=@affiliate/server",
+    "clean": "turbo run clean && rm -rf node_modules"
+  },
+  "devDependencies": {
+    "turbo": "^2.3.3",
+    "typescript": "^5.7.3"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "packageManager": "npm@10.9.0"
+}

@@ -1,0 +1,361 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:../../../data/database.sqlite"
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CORE PROJECT MODELS
+// ═══════════════════════════════════════════════════════════════════════════
+
+model Project {
+  id                String   @id @default(uuid())
+  name              String
+  slug              String   @unique
+  status            String   @default("draft") // draft, active, archived
+
+  // Brand Info
+  brandName         String
+  brandDescription  String?
+  amazonTrackingId  String
+  amazonMarketplace String   @default("amazon.com")
+
+  // Colors (stored as JSON)
+  brandColors       String   @default("{\"primary\":\"#2563eb\",\"secondary\":\"#1e40af\",\"accent\":\"#f59e0b\"}")
+
+  // Configuration
+  template          String   @default("modern")
+  selectedBlocks    String   @default("[]") // JSON array
+  selectedPages     String   @default("[\"home\",\"products\",\"about\"]") // JSON array
+  languages         String   @default("[\"en\"]") // JSON array
+  defaultLanguage   String   @default("en")
+
+  // Assets config (stored as JSON)
+  assetsConfig      String   @default("{\"generateLogo\":true,\"generateFavicon\":true,\"generateOgImage\":true}")
+
+  // .htaccess config (stored as JSON)
+  htaccessConfig    String   @default("{\"enableGzip\":true,\"enableCaching\":true,\"forceHttps\":true,\"wwwRedirect\":\"none\"}")
+
+  // Metadata
+  notes             String?
+  tags              String?  // JSON array
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  lastGeneratedAt   DateTime?
+  generationCount   Int      @default(0)
+
+  // Relations
+  domains           Domain[]
+  products          Product[]
+  ctas              CTA[]
+  generations       Generation[]
+  deployments       Deployment[]
+
+  @@index([status])
+  @@index([slug])
+}
+
+model Domain {
+  id          String   @id @default(uuid())
+  domain      String
+  isPrimary   Boolean  @default(false)
+
+  // DNS & Registration Status
+  isRegistered      Boolean  @default(false)
+  registrarProvider String?
+  registrationDate  DateTime?
+  expirationDate    DateTime?
+  autoRenew         Boolean  @default(false)
+
+  // DNS Status
+  dnsProvider       String?
+  dnsConfigured     Boolean  @default(false)
+  nameservers       String?  // JSON array
+
+  // SSL Status
+  sslEnabled        Boolean  @default(false)
+  sslProvider       String?
+  sslExpiresAt      DateTime?
+
+  // CDN Status
+  cdnEnabled        Boolean  @default(false)
+  cdnProvider       String?
+  cdnZoneId         String?
+
+  // Verification
+  verificationStatus String  @default("pending") // pending, verified, failed
+  verificationToken  String?
+  lastCheckedAt      DateTime?
+
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([projectId, domain])
+  @@index([domain])
+}
+
+model Product {
+  id                String   @id @default(uuid())
+  asin              String
+  title             String?
+  customTitle       String?
+  customDescription String?
+  imageUrl          String?
+  generateImage     Boolean  @default(true)
+  sortOrder         Int      @default(0)
+
+  // Generated content cache
+  generatedTitle       String?
+  generatedDescription String?
+  generatedImagePath   String?
+
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([projectId, asin])
+  @@index([projectId])
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CTA & AFFILIATE LINK MANAGEMENT
+// ═══════════════════════════════════════════════════════════════════════════
+
+model CTA {
+  id          String   @id @default(uuid())
+
+  // Identification
+  name        String
+  label       String
+
+  // Link Configuration
+  linkType    String   @default("product")  // product, custom, collection, search
+
+  // For product links
+  productId   String?
+
+  // For custom Amazon links
+  customUrl   String?
+
+  // For collection/search links
+  amazonSearchQuery  String?
+  amazonNode         String?
+
+  // Styling
+  style       String   @default("primary")  // primary, secondary, outline, text
+  size        String   @default("md")       // xs, sm, md, lg, xl
+  icon        String?
+
+  // Placement tracking
+  placement   String                        // hero, product-card, sidebar, footer, inline
+  blockId     String?
+
+  // Multi-language support
+  translations String  @default("{}")       // JSON: { "de": "Jetzt kaufen", "fr": "Acheter" }
+
+  // Status
+  isActive    Boolean  @default(true)
+
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([projectId])
+  @@index([placement])
+}
+
+// Global CTA Templates (reusable across projects)
+model CTATemplate {
+  id          String   @id @default(uuid())
+  name        String
+  label       String
+  style       String   @default("primary")
+  size        String   @default("md")
+  icon        String?
+  placement   String
+  isDefault   Boolean  @default(false)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// GENERATION HISTORY
+// ═══════════════════════════════════════════════════════════════════════════
+
+model Generation {
+  id              String   @id @default(uuid())
+  version         Int
+
+  // File info
+  zipPath         String
+  zipSize         Int?
+
+  // Snapshot of settings at generation time
+  settingsSnapshot String
+
+  // Generation details
+  pagesGenerated   Int
+  imagesGenerated  Int
+  totalFiles       Int
+  generationTimeMs Int?
+
+  // AI usage
+  aiProvider      String   @default("{\"text\":\"openai\",\"images\":\"dalle\"}")
+  estimatedCost   Float?
+
+  // Status
+  status          String    @default("completed") // pending, processing, completed, failed
+  errorLog        String?
+  generationLog   String?   // JSON array of log entries
+
+  projectId       String
+  project         Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  createdAt       DateTime  @default(now())
+
+  @@unique([projectId, version])
+  @@index([projectId])
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// INFRASTRUCTURE - HOSTING & DEPLOYMENT
+// ═══════════════════════════════════════════════════════════════════════════
+
+model HostingProvider {
+  id              String   @id @default(uuid())
+  name            String
+  type            String                    // sftp, cpanel, plesk, vercel, netlify, s3
+
+  // Connection details (encrypted JSON)
+  credentials     String
+
+  // Status
+  isActive        Boolean  @default(true)
+  lastTestedAt    DateTime?
+  lastTestResult  String?                   // success, failed, unknown
+
+  // Relations
+  deployments     Deployment[]
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Deployment {
+  id              String   @id @default(uuid())
+
+  // What was deployed
+  generationId    String?
+  version         Int
+
+  // Where it was deployed
+  providerId      String
+  provider        HostingProvider @relation(fields: [providerId], references: [id])
+
+  // Deployment details
+  targetPath      String
+  deployedUrl     String?
+
+  // Status
+  status          String   @default("pending") // pending, uploading, completed, failed, rolled-back
+  progress        Int      @default(0)         // 0-100
+  filesUploaded   Int      @default(0)
+  totalFiles      Int      @default(0)
+
+  // Logs
+  deploymentLog   String?                   // JSON array of log entries
+  errorMessage    String?
+
+  // Timing
+  startedAt       DateTime?
+  completedAt     DateTime?
+
+  projectId       String
+  project         Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([projectId])
+  @@index([status])
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// INFRASTRUCTURE - CDN & DNS PROVIDERS
+// ═══════════════════════════════════════════════════════════════════════════
+
+model CDNProvider {
+  id              String   @id @default(uuid())
+  name            String
+  type            String                    // cloudflare, bunny, fastly
+
+  // API credentials (encrypted)
+  credentials     String
+
+  // Account info
+  accountId       String?
+
+  isActive        Boolean  @default(true)
+  lastTestedAt    DateTime?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model DomainRegistrar {
+  id              String   @id @default(uuid())
+  name            String
+  type            String                    // cloudflare, namecheap, godaddy
+
+  // API credentials (encrypted)
+  credentials     String
+
+  // Account info
+  accountId       String?
+  accountEmail    String?
+
+  isActive        Boolean  @default(true)
+  lastTestedAt    DateTime?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// GLOBAL SETTINGS
+// ═══════════════════════════════════════════════════════════════════════════
+
+model Settings {
+  id              String   @id @default("global")
+
+  // API Keys (encrypted)
+  openaiApiKey    String?
+  geminiApiKey    String?
+
+  // Default providers
+  defaultTextProvider   String @default("openai")
+  defaultImageProvider  String @default("dalle")
+
+  // Default project settings (JSON)
+  defaultProjectSettings String?
+
+  // Output settings
+  outputDirectory       String @default("./output")
+  keepVersions          Int    @default(5)
+
+  // UI preferences
+  theme                 String @default("system")
+
+  updatedAt       DateTime @updatedAt
+}

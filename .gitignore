@@ -1,0 +1,57 @@
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+
+# Build outputs
+dist
+build
+.next
+out
+
+# Database
+data/*.sqlite
+data/*.sqlite-journal
+*.db
+*.db-journal
+
+# Generated files
+apps/server/src/prisma/generated
+
+# Environment
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Turbo
+.turbo
+
+# Output
+output/*
+!output/.gitkeep
+
+# Test
+coverage
+
+# Misc
+*.tgz
+.cache
